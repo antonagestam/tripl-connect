@@ -65,6 +65,8 @@
 
 			if( curl_getinfo( $ch, CURLINFO_HTTP_CODE ) != 200 ){
 				
+				
+
 				echo "Something went wrong when trying to get access token from tripl<br/><pre>";
 				var_dump($result);
 				exit;
