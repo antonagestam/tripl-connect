@@ -10,9 +10,12 @@
 		}
 
 		public function __get( $key ){
+
+			if( !isset( $this->data[$key] ) )
+				return null;
 			
 			return $this->data[$key];
-
+			
 		}
 
 		public function __construct( $data = null ){
@@ -52,25 +55,31 @@
 					'client_secret' => TRIPL_CLIENT_SECRET,
 					'grant_type' => 'authorization_code',
 					'code' => $authToken,
+					'devMode' => 1,
 				),
 			);
 
 			curl_setopt_array( $ch, $options );
 
-			$data = curl_exec( $ch );
+			$result = curl_exec( $ch );
 
 			if( curl_getinfo( $ch, CURLINFO_HTTP_CODE ) != 200 ){
 				
 				echo "Something went wrong when trying to get access token from tripl<br/><pre>";
-				var_dump($data);
+				var_dump($result);
 				exit;
 
 			}else{
 
-				$data = json_decode( $data, true );
+				$data = json_decode( $result, true );
+				$data = $data['data'];
+
+				if( !isset( $data['access_token'], $data['user_id'] ) )
+					throw new Exception("Did not revieve valid data from Tripl, <pre>" . print_r( $result, true ) . "</pre>");
+
 				$user = new User();
-				$user->access_token = $data['data']['access_token'];
-				$user->id = $data['data']['user_id'];
+				$user->access_token = $data['access_token'];
+				$user->id = $data['user_id'];
 				$user->save();
 				return $user;
 
@@ -80,8 +89,12 @@
 
 		private function fetchDataFromTripl($api = 'user/me'){
 
+			if( is_null( $this->access_token ) )
+				throw new Exception("Can't fetch data, invalid access token");
+
 			$params = http_build_query(array(
-				'access_token' => $this->access_token
+				'access_token' => $this->access_token,
+				'devMode' => 1
 			));
 
 			$url = TRIPL_API_BASE . $api . '?' . $params;
@@ -98,6 +111,10 @@
 			curl_setopt_array( $ch, $options );
 
 			$result = curl_exec( $ch );
+
+			if( ( $code = curl_getinfo( $ch, CURLINFO_HTTP_CODE ) ) != 200 )
+				throw new Exception( $result );
+
 			return $result;
 
 		}
