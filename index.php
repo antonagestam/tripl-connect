@@ -24,21 +24,23 @@
 
 		$data = curl_exec( $ch );
 
-		var_dump( $data );
-
 		if( curl_getinfo( $ch, CURLINFO_HTTP_CODE ) != 200 ){
 			echo "Something went wrong when trying to get access token from tripl<br/><pre>";
 			var_dump($data);
 		}
 
 		$data = json_decode( $data, true );
-		var_dump( $data );
 		$user = new User();
 		$user->access_token = $data['data']['access_token'];
 		$user->id = $data['data']['user_id'];
 		$user->save();
 
-		var_dump( $user->access_token );
+?>
+
+<p>Successfully retrieved access token from tripl</p>
+<p><a href="fetchuser.php?user_id=<?= $user->id ?>">Fetch data from tripl</a></p>
+
+<?php
 
 	}else{
 ?>

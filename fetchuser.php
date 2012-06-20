@@ -5,3 +5,5 @@
 
 	$user = User::load(38328);
 	$user->fetchUserFromTripl();
+
+	header('Location: showuser.php?user_id=' . $user->id);
