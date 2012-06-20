@@ -3,7 +3,7 @@
 
 	require_once("config.php");
 
-	$user = User::load(38328);
+	$user = User::load($_GET['user_id']);
 	$user->fetchUserFromTripl();
 
 	header('Location: showuser.php?user_id=' . $user->id);
