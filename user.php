@@ -48,6 +48,7 @@
 			$options = array(
 				CURLOPT_URL => $url,
 				//CURLOPT_USERPWD => "tripl:triplnewsummer",
+				CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_0,
 				CURLOPT_RETURNTRANSFER => true,
 				CURLOPT_HEADER => false
 			);
